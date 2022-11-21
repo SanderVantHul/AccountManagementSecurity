@@ -1,0 +1,83 @@
+﻿@using System.Security.Claims
+@model ApplicationUser
+
+@{
+    var user = @Model;
+    ViewBag.Title = "User Details";
+}
+
+<h1>Details For User @user?.UserName</h1>
+
+@if (user != null)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">User Name: @user.UserName</h5>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Email: @user.Email</h5>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Phone Number: @user.PhoneNumber</h5>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Games Won: @user.GamesWon</h5>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Games Lost: @user.GamesLost</h5>
+        </div>
+        <div class="card-footer">
+            <table width="100%">
+                <tr>
+                    @if (user.LockoutEnabled)
+                    {
+                        <td>
+                            <form asp-action="Ban" method="post">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="submit" value="Ban" formnovalidate onclick="return confirm('Are you sure?')" class="btn btn-danger" />
+                            </form>
+                        </td>
+                        @if (User.HasClaim(ClaimTypes.Role, "Admin"))
+                        {
+                            <td>
+                                <a asp-action="Edit" asp-controller="User" asp-route-id="@user.Id" class="btn btn-primary">
+                                    Edit
+                                </a>
+                            </td>
+                            <td>
+                                <form asp-action="Delete" method="post">
+                                    <input type="hidden" asp-for="Id" />
+                                    <input type="submit" value="Delete" formnovalidate onclick="return confirm('Are you sure?')" class="btn btn-danger" />
+                                </form>
+                            </td>
+                        }
+                    }
+                </tr>
+            </table>
+            @if (User.HasClaim(ClaimTypes.Role, "Admin"))
+            {
+                <div class="m-3">
+                    <form asp-action="AddRole" method="post"> <!-- 4.2.2 -->
+                        <input type="hidden" asp-for="Id" />
+                        <select class="form-control" asp-for="UserName" asp-items="ViewBag.roles">
+                            <option disabled selected>-</option>
+                        </select>
+                        <input type="submit" value="Add Role" class="btn btn-primary" />
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            This user no longer exists
+        </div>
+    </div>
+}
+
